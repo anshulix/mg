@@ -16,12 +16,11 @@
             // Examine the text in the response
             response.json().then(function(data) {
                 //let len = data["user_data"].length;
-                let tableData = data["user_data"];
-                global.mgTableData = tableData;
-                CreateTable(tableData);
+                global.mgTableData = data["user_data"];
+                CreateTable(global.mgTableData);
                 FilterOnCity('Delhi');
                 FilterOnCity('Mumbai');
-               // SortTable();
+                SortTable();
             });
             }
         )
@@ -40,10 +39,25 @@
                 let tbContentStart = "<td>";
                 let tbContentEnd = "</td>";
                 let tContent = "";
+                let trHead;
+                let filterHidden;
+                if(global.mgFilterApplied){
+                    filterHidden = 'hidemg';
+                }
                 //document.getElementById("mg-head").append
                 for(let i of tableData){
-
-                    tContent += "<tr class='hidemg' data-city='"+i.city+"'>" 
+                    if(global.mgFilterApplied){
+                        if(i.filtershow){
+                           trHead = "<tr class='"+i.filtershow+"' data-city='"+i.city+"'>" ;
+                        }
+                        else{
+                           trHead = "<tr class='"+filterHidden+"' data-city='"+i.city+"'>" ;
+                        }
+                    }
+                    else{
+                        trHead = "<tr class='' data-city='"+i.city+"'>" ;
+                    }
+                    tContent += trHead
                     + tbContentStart + i.first_name + tbContentEnd 
                     + tbContentStart + i.last_name + tbContentEnd
                     + tbContentStart + i.email + tbContentEnd
@@ -59,10 +73,17 @@
         }
 
         var FilterOnCity = function(city){
-            var filterCity = document.querySelectorAll("tr[data-city='"+city+"']");
-            for(let k of filterCity){
-                k.setAttribute('class', 'showmg');
+            // var filterCity = document.querySelectorAll("tr[data-city='"+city+"']");
+            // for(let k of filterCity){
+            //     k.setAttribute('class', 'showmg');
+            // }
+            for(let i of mgTableData){
+                if(i.city === city){
+                    i.filtershow = 'showmg';
+                }
             }
+            global.mgFilterApplied = true;
+            CreateTable(mgTableData);
         }
 
         var SortTable = function(){
